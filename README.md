@@ -4,6 +4,9 @@ A fully local, private voice assistant for a **Home Assistant Container** instal
 running on a **Raspberry Pi 4**: say *"Alexa, …"*, and Home Assistant answers
 through a speaker — with sub-2-second responses.
 
+> **The only hardware you need is a Raspberry Pi 4, a USB microphone and a
+> speaker connected to the headphone jack.**
+
 Speech-to-text, text-to-speech and wake-word detection all run **on the Pi**
 (Docker containers). The only optional external piece is the language model,
 which can be any Home Assistant conversation agent (here: a cloud model via
@@ -35,9 +38,6 @@ setup, including the two problems that cost the most time to find:
    stuck "listening". `home-assistant/patch-ha-wyoming.sh` fixes it.
 
 ## Hardware used
-
-The only hardware you need is a Raspberry Pi 4, a USB microphone and a speaker
-connected to the headphone jack.
 
 - Raspberry Pi 4 (4 GB or 8 GB), Raspberry Pi OS 64-bit
 - A USB microphone/headset and a speaker or headphones
