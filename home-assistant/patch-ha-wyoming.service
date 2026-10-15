@@ -1,0 +1,11 @@
+[Unit]
+Description=Apply Wyoming assist_satellite race fix to the Home Assistant container
+After=docker.service
+Wants=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/patch-ha-wyoming.sh
+
+[Install]
+WantedBy=multi-user.target

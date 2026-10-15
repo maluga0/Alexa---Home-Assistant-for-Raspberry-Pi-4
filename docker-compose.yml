@@ -1,0 +1,116 @@
+name: alexa
+
+# Local, private, fast Alexa-style voice assistant for Home Assistant (Container install).
+# Everything runs on the Raspberry Pi; the only optional external piece is the LLM
+# (Ollama), which in this setup is a cloud model. STT, TTS and wake word are 100% local.
+#
+# Configuration is via a .env file next to this file (see .env.example).
+
+services:
+  # Speech-to-text. Uses sherpa-onnx streaming Zipformer by default: it is
+  # several times faster than Whisper on a Pi and streams as you speak.
+  # (Set STT_LIBRARY=faster-whisper + STT_MODEL=tiny-int8 for the Whisper path.)
+  whisper:
+    image: rhasspy/wyoming-whisper:latest
+    container_name: wyoming-whisper
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ${PI_CACHE_DIR}/whisper:/data
+    environment:
+      HF_HOME: /data
+      XDG_CACHE_HOME: /data
+      MODELSCOPE_CACHE: /data/modelscope
+    command:
+      - --uri
+      - tcp://127.0.0.1:10300
+      - --stt-library
+      - ${STT_LIBRARY:-sherpa}
+      - --sherpa-streaming
+      - --model
+      - ${STT_MODEL:-sherpa-onnx-streaming-zipformer-en-kroko-2025-08-06}
+      - --language
+      - ${STT_LANGUAGE:-en}
+      - --device
+      - cpu
+      - --zeroconf
+
+  # Text-to-speech (neural). Good quality, ~2x realtime on a Pi 4.
+  # Kept as the quality option; the pipeline can point at it instead of espeak.
+  piper:
+    image: rhasspy/wyoming-piper:latest
+    container_name: wyoming-piper
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ${PI_CACHE_DIR}/piper:/data
+    command:
+      - --uri
+      - tcp://127.0.0.1:10200
+      - --voice
+      - ${PIPER_VOICE:-en_GB-alan-low}
+      - --length-scale
+      - "1.0"
+      - --zeroconf
+
+  # Wake word ("Alexa"). openWakeWord.
+  openwakeword:
+    image: rhasspy/wyoming-openwakeword:local
+    build:
+      context: ./openwakeword
+    container_name: wyoming-openwakeword
+    restart: unless-stopped
+    network_mode: host
+    command:
+      - --uri
+      - tcp://127.0.0.1:10400
+      - --preload-model
+      - ${WAKE_WORD:-alexa}
+      - --zeroconf
+
+  # Text-to-speech (formant, espeak-ng). Robotic but ~60x realtime -> instant.
+  # Custom Wyoming server (see espeak/), because Home Assistant has no native
+  # espeak-ng integration.
+  espeak:
+    image: wyoming-espeak:local
+    build:
+      context: ./espeak
+    container_name: wyoming-espeak
+    restart: unless-stopped
+    network_mode: host
+    command:
+      - --uri
+      - tcp://127.0.0.1:10500
+      - --voice
+      - ${ESPEAK_VOICE:-en}
+      - --rate
+      - "175"
+      - --zeroconf
+
+  # The satellite: microphone + speaker on the Pi, on-device wake word.
+  # --mic-command / --snd-command are examples; find your devices with
+  # `arecord -l` and `aplay -l` and adjust.
+  satellite:
+    image: rhasspy/wyoming-satellite:1.4.1
+    container_name: wyoming-satellite
+    build:
+      context: ./satellite
+    restart: unless-stopped
+    network_mode: host
+    devices:
+      - /dev/snd:/dev/snd
+    command:
+      - --name
+      - ${SATELLITE_NAME:-PiSatellite}
+      - --uri
+      - tcp://127.0.0.1:10700
+      - --zeroconf-host
+      - 127.0.0.1
+      - --wake-uri
+      - tcp://127.0.0.1:10400
+      - --wake-word-name
+      - ${WAKE_WORD:-alexa}
+      - --mic-command
+      - ${MIC_COMMAND:-arecord -D plughw:3,0 -r 16000 -c 1 -f S16_LE -t raw}
+      - --snd-command
+      - ${SND_COMMAND:-aplay -D plughw:2,0 -r 22050 -c 1 -f S16_LE -t raw}

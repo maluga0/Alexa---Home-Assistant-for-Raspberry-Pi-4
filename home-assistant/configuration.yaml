@@ -1,0 +1,21 @@
+# Minimal Home Assistant configuration for the local voice assistant.
+# This is a *reduced* example: it only shows the pieces relevant to the voice
+# assist pipeline. Your real configuration.yaml will also contain your own
+# integrations, dashboards, etc.
+
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+# The Wyoming integration is extremely chatty; keep it at warning in normal use.
+logger:
+  default: warning
+  logs:
+    homeassistant.components.wyoming: warning

@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "minor_version": 2,
+  "key": "assist_pipeline.pipelines",
+  "data": {
+    "items": [
+      {
+        "conversation_engine": "conversation.deepseek_voice",
+        "conversation_language": "en",
+        "id": "01kzkg7sbxmprgs1f1ag2sd0zm",
+        "language": "en",
+        "name": "Home Assistant",
+        "stt_engine": "stt.faster_whisper",
+        "stt_language": "en",
+        "tts_engine": "tts.espeak_ng",
+        "tts_language": "en",
+        "tts_voice": "en-gb",
+        "wake_word_entity": "wake_word.openwakeword",
+        "wake_word_id": "alexa",
+        "prefer_local_intents": true
+      }
+    ],
+    "preferred_item": "01kzkg7sbxmprgs1f1ag2sd0zm"
+  }
+}

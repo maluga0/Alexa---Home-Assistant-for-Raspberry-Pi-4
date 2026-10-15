@@ -1,0 +1,25 @@
+# --- secrets / private runtime data (never commit) ---
+.env
+secrets.yaml
+.storage/
+.cloud/
+.ha_run.lock
+home-assistant_v2.db
+home-assistant_v2.db-*
+home-assistant.log*
+*.log
+tts/
+custom_components/
+.cache/
+
+# --- models / downloads ---
+data/
+*.onnx
+*.tflite
+*.tar.bz2
+*.bin
+
+# --- misc ---
+__pycache__/
+*.pyc
+.DS_Store
