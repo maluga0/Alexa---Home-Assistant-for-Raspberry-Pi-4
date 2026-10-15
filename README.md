@@ -36,6 +36,9 @@ setup, including the two problems that cost the most time to find:
 
 ## Hardware used
 
+The only hardware you need is a Raspberry Pi 4, a USB microphone and a speaker
+connected to the headphone jack.
+
 - Raspberry Pi 4 (4 GB or 8 GB), Raspberry Pi OS 64-bit
 - A USB microphone/headset and a speaker or headphones
 - Home Assistant running as a **Docker container** (`ghcr.io/home-assistant/home-assistant:stable`)
